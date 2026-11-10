@@ -26,3 +26,10 @@ One entry per agent session, newest at the bottom. Be honest: what went wrong is
 - Checkpoints: Changed only the description of `find_lecture` before starting the new Gemini session.
 - Went wrong: Nothing failed, but the description change did not affect the tool choice. Gemini still selected `find_lecture`.
 - Changed by hand: Changed the `find_lecture` description to "Find information about a lecture."
+
+## 2026-11-10 · Study Groups Slice 1
+- Goal: Build the first working version of the Study Groups web app.
+- Delegated: Asked Gemini to create registration, login and the study groups list using Express and SQLite.
+- Checkpoints: Ran npm test (7/7 passed), npm run coverage (88.40% overall, 100% services) and checked the web app in the browser.
+- Went wrong: Gemini was initially stuck on Thinking, so I changed to a faster model. No test failures were found in Slice 1.
+- Changed by hand: Updated SPEC.md, AGENTS.md and USAGE.md.
