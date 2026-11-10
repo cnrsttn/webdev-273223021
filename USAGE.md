@@ -6,3 +6,4 @@ One row per agent session. In Gemini CLI, type `/stats` before you quit and copy
 |---|---|---:|---:|---|---|
 | 2026-10-06 | Gemini CLI | 12,812 | 55 | | TBD |
 | 2026-10-06 | Gemini CLI | 15,967 | 91 | | TBD |
+| 2026-11-10 | Gemini CLI (Exercise 2) | 14,189 | 108 | | TBD |

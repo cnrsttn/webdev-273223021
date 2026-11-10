@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Study Groups - Browse Groups</title>
+  <style>
+    body { font-family: system-ui, sans-serif; background: #f4f6f9; margin: 0; padding: 20px; }
+    .header { display: flex; justify-content: space-between; align-items: center; max-width: 800px; margin: 0 auto 20px auto; background: white; padding: 15px 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+    h1 { margin: 0; color: #333; font-size: 24px; }
+    .btn { background: #d9534f; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-weight: bold; }
+    .btn:hover { background: #c9302c; }
+    .container { max-width: 800px; margin: 0 auto; }
+    .group-card { background: white; padding: 20px; margin-bottom: 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.05); }
+    .group-card h3 { margin-top: 0; color: #0066cc; }
+    .subject { display: inline-block; background: #eef2f7; color: #333; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; margin-bottom: 10px; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>Study Groups</h1>
+    <button class="btn" onclick="logout()">Sign Out</button>
+  </div>
+  <div class="container" id="groups-container">
+    <p>Loading study groups...</p>
+  </div>
+
+  <script>
+    async function loadGroups() {
+      try {
+        const res = await fetch('/api/groups');
+        if (!res.ok) {
+          if (res.status === 401) {
+            window.location.href = '/login';
+            return;
+          }
+          throw new Error('Failed to load groups');
+        }
+        const groups = await res.json();
+        const container = document.getElementById('groups-container');
+        if (groups.length === 0) {
+          container.innerHTML = '<p>No study groups available.</p>';
+          return;
+        }
+        container.innerHTML = groups.map(g => `
+          <div class="group-card">
+            <span class="subject">${escapeHtml(g.subject)}</span>
+            <h3>${escapeHtml(g.name)}</h3>
+            <p>${escapeHtml(g.description)}</p>
+          </div>
+        `).join('');
+      } catch (err) {
+        document.getElementById('groups-container').innerHTML = '<p style="color: red;">Error loading groups.</p>';
+      }
+    }
+
+    async function logout() {
+      await fetch('/api/logout', { method: 'POST' });
+      window.location.href = '/login';
+    }
+
+    function escapeHtml(str) {
+      return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+    }
+
+    loadGroups();
+  </script>
+</body>
+</html>

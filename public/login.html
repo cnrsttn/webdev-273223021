@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Study Groups - Login / Register</title>
+  <style>
+    body { font-family: system-ui, sans-serif; background: #f4f6f9; margin: 0; padding: 40px; display: flex; justify-content: center; align-items: center; height: 100vh; }
+    .card { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); width: 100%; max-width: 400px; }
+    h2 { margin-top: 0; color: #333; }
+    .form-group { margin-bottom: 15px; }
+    label { display: block; margin-bottom: 5px; font-weight: 600; color: #555; }
+    input { width: 100%; padding: 10px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; }
+    button { width: 100%; background: #0066cc; color: white; border: none; padding: 10px; border-radius: 4px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+    button:hover { background: #0055aa; }
+    .toggle { text-align: center; margin-top: 15px; font-size: 14px; color: #666; cursor: pointer; }
+    .toggle span { color: #0066cc; text-decoration: underline; }
+    .error { color: #d9534f; font-size: 14px; margin-bottom: 10px; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div id="error-msg" class="error"></div>
+    
+    <!-- Login Form -->
+    <form id="login-form">
+      <h2>Sign In</h2>
+      <div class="form-group">
+        <label for="login-email">Email</label>
+        <input type="email" id="login-email" required>
+      </div>
+      <div class="form-group">
+        <label for="login-password">Password</label>
+        <input type="password" id="login-password" required>
+      </div>
+      <button type="submit">Sign In</button>
+      <div class="toggle" onclick="toggleMode()">Don't have an account? <span>Register</span></div>
+    </form>
+
+    <!-- Register Form -->
+    <form id="register-form" style="display: none;">
+      <h2>Register</h2>
+      <div class="form-group">
+        <label for="reg-name">Full Name</label>
+        <input type="text" id="reg-name" required>
+      </div>
+      <div class="form-group">
+        <label for="reg-email">Email</label>
+        <input type="email" id="reg-email" required>
+      </div>
+      <div class="form-group">
+        <label for="reg-password">Password</label>
+        <input type="password" id="reg-password" required>
+      </div>
+      <button type="submit">Create Account</button>
+      <div class="toggle" onclick="toggleMode()">Already have an account? <span>Sign In</span></div>
+    </form>
+  </div>
+
+  <script>
+    let isLogin = true;
+    function toggleMode() {
+      isLogin = !isLogin;
+      document.getElementById('login-form').style.display = isLogin ? 'block' : 'none';
+      document.getElementById('register-form').style.display = isLogin ? 'none' : 'block';
+      document.getElementById('error-msg').textContent = '';
+    }
+
+    document.getElementById('login-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('login-email').value;
+      const password = document.getElementById('login-password').value;
+      const res = await fetch('/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
+      if (res.ok) {
+        window.location.href = '/groups';
+      } else {
+        const data = await res.json();
+        document.getElementById('error-msg').textContent = data.error || 'Login failed';
+      }
+    });
+
+    document.getElementById('register-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const name = document.getElementById('reg-name').value;
+      const email = document.getElementById('reg-email').value;
+      const password = document.getElementById('reg-password').value;
+      const res = await fetch('/api/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, password })
+      });
+      if (res.ok) {
+        // Automatically log in or switch to login
+        const loginRes = await fetch('/api/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+        if (loginRes.ok) {
+          window.location.href = '/groups';
+        } else {
+          toggleMode();
+        }
+      } else {
+        const data = await res.json();
+        document.getElementById('error-msg').textContent = data.error || 'Registration failed';
+      }
+    });
+  </script>
+</body>
+</html>
